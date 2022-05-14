@@ -1,7 +1,10 @@
+import 'package:cart_app/providers/cart_provider.dart';
+import 'package:cart_app/screens/cart_screen.dart';
+import 'package:cart_app/widgets/badge.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-import '../providers/products_provider.dart';
+import '../widgets/app_drawer.dart';
 import '../widgets/products_grid.dart';
 
 enum FilterOptions {
@@ -25,7 +28,23 @@ class _ProductsOverviewScreenState extends State<ProductsOverviewScreen> {
       appBar: AppBar(
         title: const Text('Products'),
         actions: <Widget>[
+          Consumer<Cart>(
+            builder: (_, cart, ch) => Badge(
+              child: ch!,
+              value: cart.itemCount.toString(),
+              color: Colors.white,
+            ),
+            child: IconButton(
+              icon: const Icon(Icons.shopping_cart),
+              onPressed: () {
+                Navigator.of(context).pushNamed(CartScreen.routeName);
+              },
+            ),
+          ),
           PopupMenuButton(
+            icon: const Icon(
+              Icons.more_vert,
+            ),
             onSelected: (FilterOptions selectedValue) {
               setState(() {
                 if (selectedValue == FilterOptions.Favorites) {
@@ -35,9 +54,6 @@ class _ProductsOverviewScreenState extends State<ProductsOverviewScreen> {
                 }
               });
             },
-            icon: const Icon(
-              Icons.more_vert,
-            ),
             itemBuilder: (ctx) => [
               _showOnlyFavorites
                   ? const PopupMenuItem(
@@ -45,13 +61,14 @@ class _ProductsOverviewScreenState extends State<ProductsOverviewScreen> {
                       value: FilterOptions.All,
                     )
                   : const PopupMenuItem(
-                      child: Text('Only Favorites'),
+                      child: Text('Favorites'),
                       value: FilterOptions.Favorites,
                     ),
             ],
-          )
+          ),
         ],
       ),
+      drawer: const AppDrawer(),
       body: ProductsGrid(showFavs: _showOnlyFavorites),
     );
   }
